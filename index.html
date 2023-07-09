@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfect Notion</title>
+  <script type="module" src="./src/main.js"></script>
+</head>
+<body>
+  <div id="app">
+  </div>
+  <script>
+    const userName = 'jiinyy';
+    function 지현의_문서_가져오기() {
+      return fetch("https://kdt-frontend.programmers.co.kr/documents", {
+        headers: { 'x-username': userName }
+      }).then((response) => response.json());
+    }
+
+    async function 지현의_노션에_새로운_문서_추가(title) {
+      return await fetch("https://kdt-frontend.programmers.co.kr/documents", {
+        method: 'POST',
+        // request body
+        body: JSON.stringify({
+          title,
+          parent: null
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          'x-username': userName,
+        },
+      })
+      .then((res) => res.json())
+    }
+
+    async function 지현의_노션에서_문서_삭제(id) {
+      return await fetch(`https://kdt-frontend.programmers.co.kr/documents/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'x-username': userName,
+        },
+      })
+      .then((res) => res.json())
+    }
+
+    function 지현의_문서_그려주기(docs) {
+      const addClassName = 'add';
+      const deleteClassName = 'delete';
+      const inputClassName = 'input';
+
+      document.body.innerHTML = `
+        <main>
+          문서의 총 갯수: ${docs.length}
+
+          <input class="${inputClassName}" value="" />
+          <button class="${addClassName}">문서를 추가하고 싶어요</button>
+
+          <ul>
+            ${docs.map(({ id, title }) => `
+              <li data-id="${id}">
+                <span>${title}</span>
+                <button class="${deleteClassName}" style="border: none; background: none; cursor: pointer">😵</button>
+              </li>
+            `).join('')}
+          </ul>
+        </main>
+      `;
+
+      document.querySelector(`.${addClassName}`).addEventListener('click', () => {
+        const title = document.querySelector(`.${inputClassName}`).value || "기본 타이틀은 너무 어렵다";
+        지현의_노션에_새로운_문서_추가(title).then(() => 문서를_가져와서_그려줘())
+      });
+
+      document.querySelectorAll(`.${deleteClassName}`).forEach(($deleteButton) => {
+        $deleteButton.addEventListener('click', ({ target }) => {
+          const id = target.closest('[data-id]').dataset.id;
+          지현의_노션에서_문서_삭제(id).then(() => 문서를_가져와서_그려줘())
+        });
+      })
+    }
+
+    function 문서를_가져와서_그려줘() {
+      지현의_문서_가져오기().then(지현의_문서_그려주기);
+    }
+
+    문서를_가져와서_그려줘();
+
+    
+  </script>
+</body>
+</html>
