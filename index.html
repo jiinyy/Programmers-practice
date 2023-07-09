@@ -17,8 +17,8 @@
       }).then((response) => response.json());
     }
 
-    async function 지현의_노션에_새로운_문서_추가(title) {
-      return await fetch("https://kdt-frontend.programmers.co.kr/documents", {
+    function 지현의_노션에_새로운_문서_추가(title) {
+      return fetch("https://kdt-frontend.programmers.co.kr/documents", {
         method: 'POST',
         // request body
         body: JSON.stringify({
@@ -33,8 +33,8 @@
       .then((res) => res.json())
     }
 
-    async function 지현의_노션에서_문서_삭제(id) {
-      return await fetch(`https://kdt-frontend.programmers.co.kr/documents/${id}`, {
+    function 지현의_노션에서_문서_삭제(id) {
+      return fetch(`https://kdt-frontend.programmers.co.kr/documents/${id}`, {
         method: 'DELETE',
         headers: {
           'x-username': userName,
