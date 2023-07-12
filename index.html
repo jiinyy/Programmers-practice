@@ -1,74 +1,96 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perfect Notion</title>
-  <script type="module" src="./src/main.js"></script>
 </head>
+
 <body>
-  <div id="app">
-  </div>
   <script>
+    const addClassName = 'add';
+    const inputClassName = 'input';
+    const deleteClassName = 'delete';
+    const parentClassName = 'parent';
     const userName = 'jiinyy';
+    const apiUrl = "https://kdt-frontend.programmers.co.kr/documents"
+    const defaultConfig = {
+      headers: { 'x-username': userName }
+    }
     function 지현의_문서_가져오기() {
-      return fetch("https://kdt-frontend.programmers.co.kr/documents", {
-        headers: { 'x-username': userName }
-      }).then((response) => response.json());
+      return fetch(apiUrl, defaultConfig).then((response) => response.json());
     }
 
-    function 지현의_노션에_새로운_문서_추가(title) {
-      return fetch("https://kdt-frontend.programmers.co.kr/documents", {
+    function 지현의_노션에_새로운_문서_추가(title, parent) {
+      return fetch(apiUrl, {
+        // ...defaultConfig,
         method: 'POST',
         // request body
         body: JSON.stringify({
           title,
-          parent: null
+          parent
         }),
         headers: {
+          ...defaultConfig.headers,
           "Content-Type": "application/json",
-          'x-username': userName,
         },
       })
-      .then((res) => res.json())
+        .then((res) => res.json())
     }
 
     function 지현의_노션에서_문서_삭제(id) {
-      return fetch(`https://kdt-frontend.programmers.co.kr/documents/${id}`, {
+      return fetch(`${apiUrl}/${id}`, {
+        ...defaultConfig,
         method: 'DELETE',
-        headers: {
-          'x-username': userName,
-        },
       })
-      .then((res) => res.json())
+        .then((res) => res.json())
+    }
+
+    function 새로운_문서_그려주기(docs) {
+      return ` <ul>
+        ${docs.map(({ id, title, documents }) => /*html*/ `
+              <li data-id="${id}">
+                <strong>${id}</strong>
+                <span>${title}</span>
+                <button class="${deleteClassName}" style="border: none; background: none; cursor: pointer">❌</button>
+                ${documents.length ? 새로운_문서_그려주기(documents) : ""} 
+              </li>
+            `).join('')}
+      </ul> `
+
+    }
+
+    function 전체_문서갯수(docs) {
+      return docs.length + docs.reduce((acc, { documents }) => {
+        return acc + 전체_문서갯수(documents)
+      }, 0)
     }
 
     function 지현의_문서_그려주기(docs) {
-      const addClassName = 'add';
-      const deleteClassName = 'delete';
-      const inputClassName = 'input';
 
       document.body.innerHTML = `
         <main>
-          문서의 총 갯수: ${docs.length}
+          문서의 총 갯수: ${전체_문서갯수(docs)}
 
-          <input class="${inputClassName}" value="" />
-          <button class="${addClassName}">문서를 추가하고 싶어요</button>
+          <input class="${parentClassName}" value="" size="6" placeholder="parent_id"/>
+          <input class="${inputClassName}" value="" placeholder="문서제목" />
+          <button class="${addClassName}">문서추가</button>
 
-          <ul>
-            ${docs.map(({ id, title }) => `
-              <li data-id="${id}">
-                <span>${title}</span>
-                <button class="${deleteClassName}" style="border: none; background: none; cursor: pointer">😵</button>
-              </li>
-            `).join('')}
-          </ul>
+          ${새로운_문서_그려주기(docs)}
         </main>
       `;
+      document.querySelector(`.${inputClassName}`).focus()
+      document.querySelector(`.${inputClassName}`).addEventListener('keydown', (event) => {
+        if (event.key == "Enter") {
+          문서_추가후_그려줘()
+        }
+
+      });
 
       document.querySelector(`.${addClassName}`).addEventListener('click', () => {
-        const title = document.querySelector(`.${inputClassName}`).value || "기본 타이틀은 너무 어렵다";
-        지현의_노션에_새로운_문서_추가(title).then(() => 문서를_가져와서_그려줘())
+        문서_추가후_그려줘()
       });
 
       document.querySelectorAll(`.${deleteClassName}`).forEach(($deleteButton) => {
@@ -79,13 +101,21 @@
       })
     }
 
+    function 문서_추가후_그려줘() {
+      const title = document.querySelector(`.${inputClassName}`).value || "기본 타이틀은 너무 어렵다";
+      const parent = document.querySelector(`.${parentClassName}`).value || null;
+      지현의_노션에_새로운_문서_추가(title, parent).then(() => 문서를_가져와서_그려줘())
+    }
+
     function 문서를_가져와서_그려줘() {
       지현의_문서_가져오기().then(지현의_문서_그려주기);
     }
 
     문서를_가져와서_그려줘();
 
-    
+
+
   </script>
 </body>
+
 </html>
