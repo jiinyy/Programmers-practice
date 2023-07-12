@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    const userName = "jiinyy";
+    const apiUrl = "https://kdt-frontend.programmers.co.kr/documents";
+    const parentClassName = "parent";
+    const deleteClassName = "delete";
+    const inputClassName = "input";
+    const addClassName = "add";
+    const defaultConfig = {
+      headers: {
+        'x-username': userName
+      }
+    }
+
+
+    function 문서_가져와() {
+      return fetch(apiUrl, defaultConfig)
+        .then((res) => res.json())
+    }
+
+    function 문서_새로그려줘(title, parent) {
+      return fetch(apiUrl, {
+        method: 'POST',
+        body: JSON.stringify({
+          title,
+          parent
+        }),
+        headers: {
+          ...defaultConfig.headers,
+          'Content-Type': "application/json"
+        }
+      })
+        .then((res) => res.json())
+    }
+
+    function 문서_삭제해줘(id) {
+      return fetch(`${apiUrl}/${id}`, {
+        method: "DELETE",
+        ...defaultConfig
+      })
+        .then((res) => res.json())
+    }
+
+    function 새로운_문서_그리기(docs) {
+      return ` <ul>
+        ${docs.map(({ id, title, documents }) => `
+              <li data-id="${id}">
+                <strong>${id}</strong>
+                <span>${title}</span>
+                <button class="${deleteClassName}">❌</button>
+                ${documents.length ? 새로운_문서_그리기(documents) : ""}
+              </li>
+            `).join("")}
+      </ul> `
+    }
+
+    function 문서_총갯수(docs) {
+      return docs.length + docs.reduce((acc, { documents }) => {
+        return acc + 문서_총갯수(documents)
+
+      }, 0)
+    }
+
+    function 문서_그려줘(docs) {
+      document.body.innerHTML = `
+        <main>
+          문서 총 갯수 : ${문서_총갯수(docs)}
+          <input class='${parentClassName}' value="" placeholder="parent_id"/>
+          <input class='${inputClassName}' value="" placeholder="문서 제목을 입력해주세요" />
+          <button class='${addClassName}'>문서추가</button>
+
+          ${새로운_문서_그리기(docs)}
+        </main>
+        `;
+
+      document.querySelector(`.${inputClassName}`).focus()
+      document.querySelector(`.${inputClassName}`).addEventListener("keypress", (event) => {
+        if(event.key == "Enter") {
+          추가하면_그려줘()
+        }
+      })
+
+
+      document.querySelector(`.${addClassName}`).addEventListener("click", () => {
+        추가하면_그려줘()
+      })
+
+      document.querySelectorAll(`.${deleteClassName}`).forEach(($deleteButton) => {
+        $deleteButton.addEventListener("click", ({ target }) => {
+          const id = target.closest('[data-id]').dataset.id
+          문서_삭제해줘(id).then(() => 문서_가져와_그려줘())
+        })
+      })
+    }
+
+    function 추가하면_그려줘() {
+      const title = document.querySelector(`.${inputClassName}`).value || "타이틀이 없습니다."
+      const parent = document.querySelector(`.${parentClassName}`).value || null;
+      문서_새로그려줘(title,parent).then(() => 문서_가져와_그려줘())
+    }
+
+    function 문서_가져와_그려줘() {
+      문서_가져와().then(문서_그려줘)
+    }
+    문서_가져와_그려줘();
+  </script>
+</body>
+
+</html>
