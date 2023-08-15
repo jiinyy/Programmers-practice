@@ -63,6 +63,9 @@ function App() {
               }}/>
               {e.id} / {e.content} / {e.created}
             </label>
+            <button onClick={() => {
+                setTodoItems(todoItems.filter(({ id }) => e.id !== id));
+            }}>❌</button>
           </li>
         ))}
       </ul>
