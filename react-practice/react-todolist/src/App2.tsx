@@ -1,4 +1,4 @@
-import { useState, FormEvent, useRef } from 'react'
+import { FormEvent, useRef, useState } from "react"
 
 type TodoItem = {
   id: number,
@@ -7,7 +7,7 @@ type TodoItem = {
   completed: boolean
 }
 
-function App() {
+function App2() {
   const [todoItems, setTodoItems] = useState<TodoItem[]>([
     {
       id: 1,
@@ -29,15 +29,15 @@ function App() {
     }
   ]);
 
-  const $input = useRef<HTMLInputElement>(null);
+  const $input = useRef<HTMLInputElement>(null); // useRef => Input의 돔 정보를 가져옴
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setTodoItems([
       ...todoItems,
       {
-        id: Date.now() + Math.random(),
-        content: $input.current?.value || '',
+        id : Date.now() + Math.random(),
+        content : $input.current?.value || '',
         completed: false,
         created: Date.now(),
       }
@@ -46,7 +46,7 @@ function App() {
   }
 
   const toggle = (index: number) => {
-    const newTodoItems = [ ...todoItems];
+    const newTodoItems = [...todoItems];
     newTodoItems[index].completed = !newTodoItems[index].completed
     setTodoItems(newTodoItems)
   }
@@ -56,17 +56,17 @@ function App() {
   }
 
   return (
-    <div className="todo">
+    <div>
       <form onSubmit={submit}>
-        <input placeholder={"할일을 적으시오"} ref={$input} />
+        <input type="text" placeholder="할일을 적으세요" ref={$input} />
         <button type="submit">저장</button>
       </form>
       <ul>
         {todoItems.map((e, index) => (
           <li key={e.id}>
-            <label style={{ textDecoration: e.completed ? 'line-through' : undefined  }}>
-              <input type='checkbox' checked={e.completed} onChange={() => toggle(index)}/>
-              {e.id} / {e.content} / {e.created}
+            <label style={{ textDecoration: e.completed ? 'line-through' : undefined }} >
+              <input type="checkbox" checked={e.completed} onChange={() => toggle(index)} />
+              {e.id} / {e.content}/ {e.created}
             </label>
             <button onClick={() => deleteItem(e.id)}>❌</button>
           </li>
@@ -76,4 +76,4 @@ function App() {
   )
 }
 
-export default App
+export default App2
