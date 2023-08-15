@@ -1,5 +1,4 @@
 import { useState, FormEvent, useRef } from 'react'
-import './App.css'
 
 type TodoItem = {
   id: number,
@@ -46,8 +45,18 @@ function App() {
     event.currentTarget.reset();
   }
 
+  const toggle = (index: number) => {
+    const newTodoItems = [ ...todoItems];
+    newTodoItems[index].completed = !e.completed
+    setTodoItems(newTodoItems)
+  }
+
+  const deleteItem = (id: number) => {
+    setTodoItems(todoItems.filter((item) => id !== item.id))
+  }
+
   return (
-    <div>
+    <div className="todo">
       <form onSubmit={submit}>
         <input placeholder={"할일을 적으시오"} ref={$input} />
         <button type="submit">저장</button>
@@ -56,16 +65,10 @@ function App() {
         {todoItems.map((e, index) => (
           <li key={e.id}>
             <label style={{ textDecoration: e.completed ? 'line-through' : undefined  }}>
-              <input type='checkbox' checked={e.completed} onChange={() => {
-                const newTodoItems = [ ...todoItems];
-                newTodoItems[index].completed = !e.completed
-                setTodoItems(newTodoItems)
-              }}/>
+              <input type='checkbox' checked={e.completed} onChange={() => toggle(index)}/>
               {e.id} / {e.content} / {e.created}
             </label>
-            <button onClick={() => {
-                setTodoItems(todoItems.filter(({ id }) => e.id !== id));
-            }}>❌</button>
+            <button onClick={() => deleteItem(e.id)}>❌</button>
           </li>
         ))}
       </ul>
