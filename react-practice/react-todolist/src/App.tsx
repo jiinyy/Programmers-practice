@@ -32,7 +32,7 @@ function App() {
 
   const $input = useRef<HTMLInputElement>(null);
 
-  const submit = (event: FormEvent) => {
+  const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setTodoItems([
       ...todoItems,
@@ -43,6 +43,7 @@ function App() {
         created: Date.now(),
       }
     ])
+    event.currentTarget.reset();
   }
 
   return (
