@@ -1,34 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, FormEvent, useRef } from 'react'
 import './App.css'
 
+type TodoItem = {
+  id: number,
+  content: string,
+  created: number,
+  completed: boolean
+}
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [todoItems, setTodoItems] = useState<TodoItem[]>([
+    {
+      id: 1,
+      content: "아침",
+      created: Date.now(),
+      completed: true
+    },
+    {
+      id: 2,
+      content: "점심",
+      created: Date.now(),
+      completed: true
+    },
+    {
+      id: 3,
+      content: "저녁",
+      created: Date.now(),
+      completed: true
+    }
+  ]);
+
+  const $input = useRef<HTMLInputElement>(null);
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div>
+      <form onSubmit={submit}>
+        <input placeholder={"할일을 적으시오"} ref={$input} />
+        <button type="submit">저장</button>
+      </form>
+      <ul>
+        {todoItems.map((e, index) => (
+          <li key={e.id}>
+            <label style={{ textDecoration: e.completed ? 'line-through' : undefined  }}>
+              <input type='checkbox' checked={e.completed} onChange={() => {
+                const newTodoItems = [ ...todoItems];
+                newTodoItems[index].completed = !e.completed
+                setTodoItems(newTodoItems)
+              }}/>
+              {e.id} / {e.content} / {e.created}
+            </label>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
