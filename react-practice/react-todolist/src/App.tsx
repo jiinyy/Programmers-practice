@@ -34,6 +34,15 @@ function App() {
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
+    setTodoItems([
+      ...todoItems,
+      {
+        id: Date.now() + Math.random(),
+        content: $input.current?.value || '',
+        completed: false,
+        created: Date.now(),
+      }
+    ])
   }
 
   return (
