@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
-import App8 from './App8.tsx'
+import App9 from './App9.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App8 />
+    <App9 />
   </React.StrictMode>,
 )
